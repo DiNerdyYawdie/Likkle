@@ -24,6 +24,7 @@
 		6EDCD43B2528F41300B5B1C6 /* SearchHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDCD43A2528F41300B5B1C6 /* SearchHomeViewModel.swift */; };
 		6EDCD43E2528FF7200B5B1C6 /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDCD43D2528FF7200B5B1C6 /* AddPostView.swift */; };
 		6EDCD4422528FF8700B5B1C6 /* AddPostViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDCD4412528FF8700B5B1C6 /* AddPostViewModel.swift */; };
+		6EF679A9254E2FF500B202F0 /* CloudkitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF679A8254E2FF500B202F0 /* CloudkitManager.swift */; };
 		FBFF0B7C5498E664D4563224 /* Pods_Likkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C38A696E87C00B6E5685F60 /* Pods_Likkle.framework */; };
 /* End PBXBuildFile section */
 
@@ -50,6 +51,7 @@
 		6EDCD43A2528F41300B5B1C6 /* SearchHomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchHomeViewModel.swift; sourceTree = "<group>"; };
 		6EDCD43D2528FF7200B5B1C6 /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 		6EDCD4412528FF8700B5B1C6 /* AddPostViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostViewModel.swift; sourceTree = "<group>"; };
+		6EF679A8254E2FF500B202F0 /* CloudkitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudkitManager.swift; sourceTree = "<group>"; };
 		9C38A696E87C00B6E5685F60 /* Pods_Likkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Likkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -116,6 +118,7 @@
 				6E794F262528EB8E0058C2EF /* Likkle.entitlements */,
 				6E8167172528A3F200670C33 /* LikkleApp.swift */,
 				6EDCD4292528F13B00B5B1C6 /* ContentView.swift */,
+				6EF679A8254E2FF500B202F0 /* CloudkitManager.swift */,
 				6E49DE2925408D510011B082 /* Profile View */,
 				6E49DE2525408C970011B082 /* Common Views */,
 				6EDCD4402528FF7600B5B1C6 /* Add Post View */,
@@ -294,6 +297,7 @@
 				6EDCD43B2528F41300B5B1C6 /* SearchHomeViewModel.swift in Sources */,
 				6EDCD4382528F33000B5B1C6 /* SettingsDetailView.swift in Sources */,
 				6EDCD43E2528FF7200B5B1C6 /* AddPostView.swift in Sources */,
+				6EF679A9254E2FF500B202F0 /* CloudkitManager.swift in Sources */,
 				6E49DE2B25408D670011B082 /* ProfileViewModel.swift in Sources */,
 				6EDCD4422528FF8700B5B1C6 /* AddPostViewModel.swift in Sources */,
 				6E81671A2528A3F200670C33 /* SearchHomeView.swift in Sources */,

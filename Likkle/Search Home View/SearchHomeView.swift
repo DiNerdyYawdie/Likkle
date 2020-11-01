@@ -15,6 +15,7 @@ struct SearchHomeView: View {
         sortDescriptors: [],
         animation: .default)
     private var posts: FetchedResults<Post>
+    var cloudKitManager: CloudKitManager
     
     @ObservedObject var viewModel: SearchHomeViewModel
 
@@ -31,11 +32,14 @@ struct SearchHomeView: View {
                         Text("Add Post")
                     }))
                     .sheet(isPresented: self.$viewModel.showAddPostModal, content: {
-                        AddPostView(viewModel: AddPostViewModel())
+                        AddPostView(viewModel: AddPostViewModel(), cloudkitManager: cloudKitManager)
                     })
                     .alert(isPresented: self.$viewModel.showAlert, content: {
                         Alert(title: Text("Oops"), message: Text("Failed to save post.\n Please Retry"), dismissButton: .cancel(Text("OK")))
                     })
+                    .onAppear {
+                        cloudKitManager.requestUserInfo()
+                        }
                 }
             }
         }

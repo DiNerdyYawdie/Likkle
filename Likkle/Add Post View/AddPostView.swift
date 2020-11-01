@@ -14,6 +14,9 @@ struct AddPostView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
     
+    var cloudkitManager: CloudKitManager
+    @State var showCloudkitAlert: Bool = false
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -48,8 +51,6 @@ struct AddPostView: View {
                     Spacer()
                 }
                 
-                
-                
                 TextField("Serial Code on cash...", text: self.$viewModel.serialNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -65,28 +66,35 @@ struct AddPostView: View {
                     .padding()
                 
                 Button {
-                    let post = Post(context: viewContext)
-                    post.serialNumber = self.viewModel.serialNumber
-                    post.caption = self.viewModel.caption
-                    if !self.viewModel.images.isEmpty {
-                        let uploadedImage = self.viewModel.images[0]
-                        
-                        guard let data = uploadedImage.pngData() else {
-                            self.viewModel.showAlert.toggle()
-                            return  }
                     
-                        post.postImage = data
+                    //Check if user can post
+                    if cloudkitManager.accountStatus == .available {
+                        let post = Post(context: viewContext)
+                        post.serialNumber = self.viewModel.serialNumber
+                        post.caption = self.viewModel.caption
+                        if !self.viewModel.images.isEmpty {
+                            let uploadedImage = self.viewModel.images[0]
+                            
+                            guard let data = uploadedImage.pngData() else {
+                                self.viewModel.showAlert.toggle()
+                                return  }
                         
-                    }
-                    
-                    do {
-                        if self.viewContext.hasChanges {
-                            try self.viewContext.save()
-                            self.presentationMode.wrappedValue.dismiss()
+                            post.postImage = data
                         }
-                    } catch {
-                        self.viewModel.showAlert.toggle()
+                        
+                        do {
+                            if self.viewContext.hasChanges {
+                                try self.viewContext.save()
+                                self.presentationMode.wrappedValue.dismiss()
+                            }
+                        } catch {
+                            self.viewModel.showAlert.toggle()
+                        }
+                    } else {
+                        //Show Cloudkit Alert if not logged in
+                        self.showCloudkitAlert.toggle()
                     }
+                    
                 } label: {
                     
                     Text("Share")
@@ -109,16 +117,23 @@ struct AddPostView: View {
             .alert(isPresented: self.$viewModel.showAlert, content: {
                 Alert(title: Text("Oops"), message: Text("Failed to save post.\n Please Retry"), dismissButton: .cancel(Text("OK")))
             })
+            .alert(isPresented: self.$showCloudkitAlert, content: {
+                Alert(title: Text("Please login to your Apple iCloud Account on your device"), message: Text("\(cloudkitManager.accountStatus.rawValue.description)"), dismissButton: .cancel())
+            })
             .navigationBarTitle(Text("Add Post"), displayMode: .automatic)
-            .navigationBarItems(trailing:
-                                    Image(systemName: "x.circle.fill")
-                                    .resizable()
-                                    .frame(width: 25, height: 25, alignment: .center)
-                                    .foregroundColor(Color.red)
-                                    .onTapGesture {
-                                        self.presentationMode.wrappedValue.dismiss()
-                                    })
-            
+            .navigationBarItems(trailing: closeButton)
+        }
+        
+        
+    }
+    
+    var closeButton: some View {
+        Image(systemName: "x.circle.fill")
+        .resizable()
+        .frame(width: 25, height: 25, alignment: .center)
+        .foregroundColor(Color.red)
+        .onTapGesture {
+            self.presentationMode.wrappedValue.dismiss()
         }
     }
 }
