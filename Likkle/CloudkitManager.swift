@@ -69,6 +69,7 @@ class CloudKitManager {
                 } else {
                     guard let id = recordId else { return }
                     
+                    print(id)
                     self?.userId = id
                 }
             }

@@ -20,10 +20,8 @@ struct AddPostView: View {
     var body: some View {
         NavigationView {
             ScrollView {
+                CommonInfoView(infoNotice: "Add a photo with caption to your Muckle with cash your serial code as ID")
                 
-                Text("Add a photo with caption to your Muckle with cash your serial code as ID")
-                    .font(.footnote)
-                    .padding()
                 HStack {
                     Spacer()
                     if self.viewModel.images.isEmpty {
@@ -54,10 +52,8 @@ struct AddPostView: View {
                 TextField("Serial Code on cash...", text: self.$viewModel.serialNumber)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                
-                Text("Add caption")
-                    .font(.footnote)
-                    .padding(.leading)
+
+                CommonInfoView(infoNotice: "Add caption")
                 
                 TextEditor(text: self.$viewModel.caption)
                     .border(Color.gray.opacity(0.6), width: 2)
@@ -65,50 +61,30 @@ struct AddPostView: View {
                     .frame(height: 200)
                     .padding()
                 
-                Button {
-                    
-                    //Check if user can post
-                    if cloudkitManager.accountStatus == .available {
-                        let post = Post(context: viewContext)
-                        post.serialNumber = self.viewModel.serialNumber
-                        post.caption = self.viewModel.caption
-                        if !self.viewModel.images.isEmpty {
-                            let uploadedImage = self.viewModel.images[0]
-                            
-                            guard let data = uploadedImage.pngData() else {
-                                self.viewModel.showAlert.toggle()
-                                return  }
+                
+                CommonButtonView(title: "Share", isDisabled: self.$viewModel.isButtonEnabled) {
+                    let post = Post(context: viewContext)
+                    post.serialNumber = self.viewModel.serialNumber
+                    post.caption = self.viewModel.caption
+                    if !self.viewModel.images.isEmpty {
+                        let uploadedImage = self.viewModel.images[0]
                         
-                            post.postImage = data
-                        }
-                        
-                        do {
-                            if self.viewContext.hasChanges {
-                                try self.viewContext.save()
-                                self.presentationMode.wrappedValue.dismiss()
-                            }
-                        } catch {
+                        guard let data = uploadedImage.pngData() else {
                             self.viewModel.showAlert.toggle()
-                        }
-                    } else {
-                        //Show Cloudkit Alert if not logged in
-                        self.showCloudkitAlert.toggle()
+                            return  }
+                    
+                        post.postImage = data
                     }
                     
-                } label: {
-                    
-                    Text("Share")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .accentColor(.white)
-                        .padding()
-                        
+                    do {
+                        if self.viewContext.hasChanges {
+                            try self.viewContext.save()
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    } catch {
+                        self.viewModel.showAlert.toggle()
+                    }
                 }
-                .disabled(!self.viewModel.images.isEmpty || !self.viewModel.caption.isEmpty && !self.viewModel.serialNumber.isEmpty ? false : true)
-                .frame(width: 200, alignment: .center)
-                .background(!self.viewModel.images.isEmpty || !self.viewModel.caption.isEmpty && !self.viewModel.serialNumber.isEmpty ? Color.green : Color.gray)
-                .cornerRadius(20)
-                .padding()
 
             }
             .sheet(isPresented: self.$viewModel.pickerBool, content: {
@@ -122,6 +98,9 @@ struct AddPostView: View {
             })
             .navigationBarTitle(Text("Add Post"), displayMode: .automatic)
             .navigationBarItems(trailing: closeButton)
+            .onAppear {
+                self.viewModel.enableButton()
+            }
         }
         
         

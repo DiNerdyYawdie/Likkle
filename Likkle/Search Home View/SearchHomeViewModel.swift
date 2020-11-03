@@ -13,4 +13,5 @@ class SearchHomeViewModel: ObservableObject {
     @Published var serialNumber: String  = ""
     @Published var showAddPostModal: Bool = false
     @Published var showAlert: Bool = false
+    @Published var showProfileModal: Bool = false
 }

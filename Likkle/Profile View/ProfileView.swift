@@ -12,7 +12,13 @@ struct ProfileView: View {
     
     @ObservedObject var viewModel: ProfileViewModel
     @Environment(\.managedObjectContext) private var viewContext
+    @State private var profileSegmentIndex = 0
     var cloudKitManager: CloudKitManager
+    @FetchRequest(
+        entity: Post.entity(),
+        sortDescriptors: []
+    ) var posts: FetchedResults<Post>
+    
     
     var body: some View {
         NavigationView {
@@ -26,8 +32,30 @@ struct ProfileView: View {
                 Text(cloudKitManager.fullname)
                     .font(.title)
                 
-                Text(cloudKitManager.userBio)
-                    .font(.title)
+                TextView(text: self.$viewModel.bioText, placeholderText: "Tell us about yourself?", textStyle: UIFont.TextStyle.caption1)
+                    .padding()
+                    .frame(height: 100)
+                
+                Picker(selection: self.$profileSegmentIndex, label: Text("Jahkno")) {
+                    Text("My Posts").tag(0)
+                    
+                    Text("Favorites").tag(1)
+                }
+                
+                .onTapGesture {
+                    if self.profileSegmentIndex == 0 {
+                        self.profileSegmentIndex = 1
+                    } else {
+                        self.profileSegmentIndex = 0
+                    }
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+                
+                FilteredList(serialNumber: "", hideAvatar: profileSegmentIndex == 0 ? true : false, showProfileModal: .constant(false))
+            }
+            .onTapGesture {
+                self.hideKeyboard()
             }
             .navigationBarTitle(Text("Profile"))
             .navigationBarItems(trailing: Button(action: {

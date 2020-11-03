@@ -24,13 +24,16 @@ struct SearchHomeView: View {
             VStack {
                 HomeTextField(viewModel: self.viewModel)
                 
-                FilteredList(serialNumber: self.viewModel.serialNumber)
+                FilteredList(serialNumber: self.viewModel.serialNumber, hideAvatar: true, showProfileModal: self.$viewModel.showProfileModal)
                     .navigationBarTitle(Text("Home"), displayMode: .automatic)
                     .navigationBarItems(trailing: Button(action: {
                         self.viewModel.showAddPostModal.toggle()
                     }, label: {
                         Text("Add Post")
                     }))
+                    .sheet(isPresented: self.$viewModel.showProfileModal, content: {
+                        ProfileView(viewModel: ProfileViewModel(), cloudKitManager: cloudKitManager)
+                    })
                     .sheet(isPresented: self.$viewModel.showAddPostModal, content: {
                         AddPostView(viewModel: AddPostViewModel(), cloudkitManager: cloudKitManager)
                     })
@@ -39,10 +42,23 @@ struct SearchHomeView: View {
                     })
                     .onAppear {
                         cloudKitManager.requestUserInfo()
+
                         }
                 }
             }
         }
+    
+    func deleteAll() {
+        for post in posts {
+            viewContext.delete(post)
+        }
+        
+        do {
+            try viewContext.save()
+        } catch {
+            // handle the Core Data error
+        }
+    }
 }
 
 struct HomeTextField: View {
@@ -88,11 +104,12 @@ struct SearchHomeDetailView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 350, height: 350, alignment: .center)
-                .padding()
+            if !(post.postImage?.isEmpty ?? true) {
+                Image(uiImage: UIImage(data: post.postImage!)!)
+                    .resizable()
+                    .aspectRatio(contentMode: ContentMode.fill)
+                    .frame(width: 350, height: 350, alignment: .center)
+            }
             
             Text(post.caption ?? "")
                 .padding(.leading)
@@ -130,19 +147,24 @@ struct CommentRowView: View {
 struct FilteredList: View {
     
     var fetchRequest: FetchRequest<Post>
+    @Binding var showProfileModal: Bool
+    var hideAvatar: Bool
     
-    init(serialNumber: String) {
+    init(serialNumber: String, hideAvatar: Bool, showProfileModal: Binding<Bool>) {
+        self.hideAvatar = hideAvatar
+        self._showProfileModal = showProfileModal
         fetchRequest = FetchRequest<Post>(entity: Post.entity(), sortDescriptors: [], predicate: serialNumber.isEmpty ? NSPredicate(value: true) : NSPredicate(format: "serialNumber contains[c] %@", serialNumber), animation: .default)
     }
     
     var body: some View {
             List(fetchRequest.wrappedValue, id: \.self) { post in
                 NavigationLink(destination: SearchHomeDetailView(post: post)) {
-                    CardView(post: post)
+                    CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
                         .padding(.trailing)
                 }
                 
             }
             .listStyle(InsetListStyle())
+            
     }
 }
