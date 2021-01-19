@@ -7,15 +7,17 @@
 
 import SwiftUI
 import CoreData
+import UIKit
 
 struct SearchHomeView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var cloudkitManager: CloudKitManager
+    
     @FetchRequest( entity: Post.entity(),
         sortDescriptors: [],
         animation: .default)
     private var posts: FetchedResults<Post>
-    var cloudKitManager: CloudKitManager
     
     @ObservedObject var viewModel: SearchHomeViewModel
 
@@ -24,27 +26,29 @@ struct SearchHomeView: View {
             VStack {
                 HomeTextField(viewModel: self.viewModel)
                 
-                FilteredList(serialNumber: self.viewModel.serialNumber, hideAvatar: true, showProfileModal: self.$viewModel.showProfileModal)
+                FilteredList(serialNumber: self.viewModel.serialNumber, hideAvatar: false, showProfileModal: self.$viewModel.showProfileModal)
                     .navigationBarTitle(Text("Home"), displayMode: .automatic)
                     .navigationBarItems(trailing: Button(action: {
                         self.viewModel.showAddPostModal.toggle()
                     }, label: {
                         Text("Add Post")
+                            .fontWeight(.bold)
                     }))
                     .sheet(isPresented: self.$viewModel.showProfileModal, content: {
-                        ProfileView(viewModel: ProfileViewModel(), cloudKitManager: cloudKitManager)
+                        ProfileView(viewModel: ProfileViewModel())
                     })
                     .sheet(isPresented: self.$viewModel.showAddPostModal, content: {
-                        AddPostView(viewModel: AddPostViewModel(), cloudkitManager: cloudKitManager)
+                        AddPostView(viewModel: AddPostViewModel())
+                            .environmentObject(cloudkitManager)
                     })
                     .alert(isPresented: self.$viewModel.showAlert, content: {
                         Alert(title: Text("Oops"), message: Text("Failed to save post.\n Please Retry"), dismissButton: .cancel(Text("OK")))
                     })
                     .onAppear {
-                        cloudKitManager.requestUserInfo()
-
+                        //deleteAll()
+                        cloudkitManager.requestUserInfo()
                         }
-                }
+            }
             }
         }
     
@@ -52,7 +56,6 @@ struct SearchHomeView: View {
         for post in posts {
             viewContext.delete(post)
         }
-        
         do {
             try viewContext.save()
         } catch {
@@ -68,17 +71,12 @@ struct HomeTextField: View {
     var body: some View {
         
         HStack {
-            TextField("Serial Code on Cash...", text: self.$viewModel.serialNumber)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding(.leading)
-            
-            Button(action: { () },
-                   label: {
-                Text("Sort")
-                    .fontWeight(.semibold)
-                    .foregroundColor(Color(UIColor.systemGreen))
-                   })
-                .padding(.trailing)
+            CustomTextField(text: self.$viewModel.serialNumber)
+                .padding()
+                .frame(height: 20)
+//            TextField("Serial Code on Cash...", text: self.$viewModel.serialNumber)
+//                .textFieldStyle(RoundedBorderTextFieldStyle())
+//                .padding(.horizontal)
         }
     }
 }
@@ -102,27 +100,25 @@ struct SearchHomeDetailView: View {
     var post: Post
     
     var body: some View {
+        
+        ScrollView {
         VStack(alignment: .leading) {
             
             if !(post.postImage?.isEmpty ?? true) {
                 Image(uiImage: UIImage(data: post.postImage!)!)
                     .resizable()
-                    .aspectRatio(contentMode: ContentMode.fill)
-                    .frame(width: 350, height: 350, alignment: .center)
+                    .aspectRatio(contentMode: ContentMode.fit)
+                    //.frame(height: 300, alignment: .leading)
             }
             
             Text(post.caption ?? "")
                 .padding(.leading)
-            
-            List {
                 
-                CommentRowView()
-            }
             
             
         }
-        .navigationBarTitle(Text(post.serialNumber ?? ""))
-        
+        .navigationBarTitle(Text("Muckle"), displayMode: .inline)
+        }
     }
 }
 
@@ -159,8 +155,10 @@ struct FilteredList: View {
     var body: some View {
             List(fetchRequest.wrappedValue, id: \.self) { post in
                 NavigationLink(destination: SearchHomeDetailView(post: post)) {
-                    CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
-                        .padding(.trailing)
+                    ZStack {
+                        CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
+                    }
+                    
                 }
                 
             }

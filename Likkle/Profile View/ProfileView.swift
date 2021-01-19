@@ -13,7 +13,8 @@ struct ProfileView: View {
     @ObservedObject var viewModel: ProfileViewModel
     @Environment(\.managedObjectContext) private var viewContext
     @State private var profileSegmentIndex = 0
-    var cloudKitManager: CloudKitManager
+    @EnvironmentObject var cloudkitManager: CloudKitManager
+    
     @FetchRequest(
         entity: Post.entity(),
         sortDescriptors: []
@@ -29,12 +30,12 @@ struct ProfileView: View {
                     .aspectRatio(contentMode: .fit)
                     .padding()
                 
-                Text(cloudKitManager.fullname)
+                Text(cloudkitManager.fullname)
                     .font(.title)
                 
-                TextView(text: self.$viewModel.bioText, placeholderText: "Tell us about yourself?", textStyle: UIFont.TextStyle.caption1)
+                Text(self.viewModel.bioText)
+                    .lineLimit(4)
                     .padding()
-                    .frame(height: 100)
                 
                 Picker(selection: self.$profileSegmentIndex, label: Text("Jahkno")) {
                     Text("My Posts").tag(0)
@@ -53,6 +54,8 @@ struct ProfileView: View {
                 .padding()
                 
                 FilteredList(serialNumber: "", hideAvatar: profileSegmentIndex == 0 ? true : false, showProfileModal: .constant(false))
+                
+                
             }
             .onTapGesture {
                 self.hideKeyboard()
@@ -64,76 +67,37 @@ struct ProfileView: View {
                 Text("Edit Profile")
             }))
             .sheet(isPresented: self.$viewModel.showAddPostModal, content: {
-                EditProfileView(viewModel: viewModel, cloudkitManager: cloudKitManager)
+                EditProfileView(viewModel: viewModel)
             })
         }
     }
 }
 
-struct EditProfileView: View {
+struct ProfileList: View {
     
-    @ObservedObject var viewModel: ProfileViewModel
-    @Environment(\.presentationMode) var presentationMode
-    @Environment(\.managedObjectContext) private var viewContext
-    var cloudkitManager: CloudKitManager
+    var fetchRequest: FetchRequest<Post>
+    var hideAvatar: Bool
+    var userId: String
+    @Binding var showProfileModal: Bool
     
-    var body: some View {
-        NavigationView {
-            VStack {
-                Form {
-                    Section(header: Text("Add Photo")) {
-                        Image(systemName: "camera.viewfinder")
-                            .resizable()
-                            .frame(width: 150, height: 150, alignment: .center)
-                            .aspectRatio(contentMode: .fill)
-                            .foregroundColor(Color(UIColor.systemGreen))
-                            .onTapGesture {
-                                self.viewModel.pickerBool.toggle()
-                            }
-                            .padding()
-                    }
-                    
-                    Section(header: Text("Change Username")) {
-                        TextField("Change your username", text: self.$viewModel.newUsername)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.leading)
-                    }
-        
-                    Section(header: Text("Change Bio")) {
-                        TextEditor(text: self.$viewModel.bioText)
-                            .frame(height: 200, alignment: .center)
-                    }
-                }
-                CommonButtonView(title: "Save", isDisabled: .constant(false)) {
-                    let userRecord = UserProfile(context: viewContext)
-                    userRecord.username = self.viewModel.newUsername
-                    userRecord.bio = self.viewModel.bioText
-                    
-                    do {
-                        if self.viewContext.hasChanges {
-                            try self.viewContext.save()
-                            self.presentationMode.wrappedValue.dismiss()
-                        }
-                    } catch {
-                        self.viewModel.showAlert.toggle()
-                    }
-                }
-            }
-            .navigationTitle(Text("Edit Profile"))
-            .navigationBarItems(trailing: closeButton)
-            .sheet(isPresented: self.$viewModel.pickerBool, content: {
-                ImagePickerView(images: self.$viewModel.images, showPicker: self.$viewModel.pickerBool, selectionLimit: 1)
-            })
-        }
+    init(hideAvatar: Bool, showProfileModal: Binding<Bool>, userId: String) {
+        self.hideAvatar = hideAvatar
+        self._showProfileModal = showProfileModal
+        self.userId = userId
+        fetchRequest = FetchRequest<Post>(entity: Post.entity(), sortDescriptors: [], predicate: NSPredicate(format: "userId ==[c] %@", userId), animation: .default)
     }
     
-    var closeButton: some View {
-        Image(systemName: "x.circle.fill")
-        .resizable()
-        .frame(width: 25, height: 25, alignment: .center)
-        .foregroundColor(Color.red)
-        .onTapGesture {
-            self.presentationMode.wrappedValue.dismiss()
-        }
+    var body: some View {
+            List(fetchRequest.wrappedValue, id: \.self) { post in
+                NavigationLink(destination: SearchHomeDetailView(post: post)) {
+                    ZStack {
+                        CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
+                    }
+                    
+                }
+                
+            }
+            .listStyle(InsetListStyle())
+            
     }
 }

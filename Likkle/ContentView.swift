@@ -16,7 +16,8 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selection,
                 content:  {
-                    SearchHomeView(cloudKitManager: cloudKitManager, viewModel: SearchHomeViewModel())
+                    SearchHomeView(viewModel: SearchHomeViewModel())
+                        .environmentObject(cloudKitManager)
                         .tabItem {
                             VStack {
                                 Image(systemName: "magnifyingglass")
@@ -27,7 +28,8 @@ struct ContentView: View {
                         .tag(0)
                         .environment(\.managedObjectContext, viewContext)
                     
-                    ProfileView(viewModel: ProfileViewModel(), cloudKitManager: cloudKitManager)
+                    ProfileView(viewModel: ProfileViewModel())
+                        .environmentObject(cloudKitManager)
                         .tabItem {
                             VStack {
                                 Image(systemName: "person.circle.fill")
@@ -39,6 +41,7 @@ struct ContentView: View {
                         }
                     
                     SettingsView(viewModel: SettingsViewModel())
+                        .environmentObject(cloudKitManager)
                         .tabItem {
                             VStack {
                                 Image(systemName: "gear")

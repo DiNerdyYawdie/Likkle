@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="20B5012d" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20D5042d" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Comment" representedClassName="Comment" syncable="YES" codeGenerationType="class">
         <attribute name="comment" optional="YES" attributeType="String"/>
     </entity>
@@ -7,6 +7,7 @@
         <attribute name="caption" optional="YES" attributeType="String"/>
         <attribute name="postImage" optional="YES" attributeType="Binary"/>
         <attribute name="serialNumber" optional="YES" attributeType="String"/>
+        <attribute name="userId" optional="YES" attributeType="String"/>
     </entity>
     <entity name="UserProfile" representedClassName="UserProfile" syncable="YES" codeGenerationType="class">
         <attribute name="avatar" optional="YES" attributeType="Binary"/>
@@ -14,8 +15,8 @@
         <attribute name="username" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="Post" positionX="-63" positionY="-18" width="128" height="74"/>
-        <element name="UserProfile" positionX="-63" positionY="9" width="128" height="74"/>
         <element name="Comment" positionX="-63" positionY="18" width="128" height="44"/>
+        <element name="Post" positionX="-63" positionY="-18" width="128" height="89"/>
+        <element name="UserProfile" positionX="-63" positionY="9" width="128" height="74"/>
     </elements>
 </model>

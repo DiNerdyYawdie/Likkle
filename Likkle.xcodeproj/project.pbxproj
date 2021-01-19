@@ -10,6 +10,7 @@
 		6E10E5772529064D003B66F6 /* CommonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E10E5762529064D003B66F6 /* CommonViews.swift */; };
 		6E49DE2725408CB40011B082 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E49DE2625408CB40011B082 /* ProfileView.swift */; };
 		6E49DE2B25408D670011B082 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E49DE2A25408D670011B082 /* ProfileViewModel.swift */; };
+		6E78E47C25B6621700D2FD71 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E78E47B25B6621700D2FD71 /* EditProfileView.swift */; };
 		6E794F2A2528EBB60058C2EF /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E794F292528EBB60058C2EF /* CloudKit.framework */; };
 		6E8167182528A3F200670C33 /* LikkleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8167172528A3F200670C33 /* LikkleApp.swift */; };
 		6E81671A2528A3F200670C33 /* SearchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8167192528A3F200670C33 /* SearchHomeView.swift */; };
@@ -34,6 +35,7 @@
 		6E10E5762529064D003B66F6 /* CommonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonViews.swift; sourceTree = "<group>"; };
 		6E49DE2625408CB40011B082 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		6E49DE2A25408D670011B082 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		6E78E47B25B6621700D2FD71 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		6E794F262528EB8E0058C2EF /* Likkle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Likkle.entitlements; sourceTree = "<group>"; };
 		6E794F292528EBB60058C2EF /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		6E8167142528A3F200670C33 /* Likkle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Likkle.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +83,7 @@
 			children = (
 				6E49DE2625408CB40011B082 /* ProfileView.swift */,
 				6E49DE2A25408D670011B082 /* ProfileViewModel.swift */,
+				6E78E47B25B6621700D2FD71 /* EditProfileView.swift */,
 			);
 			path = "Profile View";
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 			files = (
 				6E8167212528A40000670C33 /* Persistence.swift in Sources */,
 				6E49DE2725408CB40011B082 /* ProfileView.swift in Sources */,
+				6E78E47C25B6621700D2FD71 /* EditProfileView.swift in Sources */,
 				6EDCD42A2528F13B00B5B1C6 /* ContentView.swift in Sources */,
 				6EDCD43B2528F41300B5B1C6 /* SearchHomeViewModel.swift in Sources */,
 				6EDCD4382528F33000B5B1C6 /* SettingsDetailView.swift in Sources */,

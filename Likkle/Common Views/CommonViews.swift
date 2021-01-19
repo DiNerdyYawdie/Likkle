@@ -8,22 +8,7 @@
 import SwiftUI
 import PhotosUI
 import SDWebImage
-
-struct CommonInfoView: View {
-    
-    var infoNotice: String
-    
-    var body: some View {
-        VStack {
-            Text(infoNotice)
-                .font(.footnote)
-                .padding()
-        }
-        .cornerRadius(10)
-        .border(Color.white, width: 1)
-        .background(Color(UIColor.gray))
-    }
-}
+import UIKit
 
 struct CardView: View {
     
@@ -34,7 +19,7 @@ struct CardView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
-            if showAvatar {
+            if !showAvatar {
                 AvatarView()
                     .onTapGesture {
                         self.showProfileModal.toggle()
@@ -45,53 +30,43 @@ struct CardView: View {
             if !(post.postImage?.isEmpty ?? true) {
                 Image(uiImage: UIImage(data: post.postImage!)!)
                     .resizable()
-                    .aspectRatio(contentMode: ContentMode.fill)
-                    .frame(height: 300)
+                    .aspectRatio(contentMode: ContentMode.fit)
+                EmptyView()
             }
 
  
             HStack {
                 VStack(alignment: .leading) {
                     Text(post.serialNumber ?? "serial number")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                        .padding(.top)
-                    
-                    Text(post.caption ?? "caption")
-                        .font(.title)
-                        .fontWeight(.black)
-                        .foregroundColor(.primary)
-                        .lineLimit(3)
-                    
-                    Text("Hmm")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                    
+                    Text(post.caption ?? "caption")
+                        .font(.caption)
+                        .fontWeight(.regular)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
                 }
-                .layoutPriority(100)
- 
-                Spacer()
             }
             .padding()
         }
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color(.sRGB, red: 150/255, green: 150/255, blue: 150/255, opacity: 0.1), lineWidth: 1)
-        )
-        .padding([.top])
     }
 }
 
 struct AvatarView: View {
     
     var body: some View {
+        HStack {
+            Image(systemName: "person")
+                .clipShape(Circle())
+                .shadow(radius: 10)
+                .overlay(Circle().stroke(Color.white, lineWidth: 1))
+                .frame(width: 25, height: 25, alignment: .center)
+            
+            Text("Chad-Michael")
+                .font(.caption2)
+        }
         
-        Image(systemName: "person")
-            .clipShape(Circle())
-            .shadow(radius: 10)
-            .overlay(Circle().stroke(Color.white, lineWidth: 1))
-            .frame(width: 20, height: 20, alignment: .center)
-            .padding()
     }
 }
 
@@ -238,3 +213,61 @@ extension View {
     }
 }
 #endif
+
+struct CustomTextField: UIViewRepresentable {
+
+    class Coordinator: NSObject, UITextFieldDelegate {
+
+        @Binding var text: String
+        var didBecomeFirstResponder = false
+
+        init(text: Binding<String>) {
+            _text = text
+        }
+
+        func textFieldDidChangeSelection(_ textField: UITextField) {
+            text = textField.text ?? ""
+        }
+        
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            textField.resignFirstResponder()
+            return true
+        }
+    }
+
+    @Binding var text: String
+    var isFirstResponder: Bool = false
+
+    func makeUIView(context: UIViewRepresentableContext<CustomTextField>) -> UITextField {
+        let textField = UITextField()
+        textField.placeholder = "Serial number on your cash "
+        textField.rightViewMode = .always
+        textField.borderStyle = .roundedRect
+        let leftViewImage = UIImageView(frame: CGRect(x: 5, y: 0, width: 10, height: 10))
+        let rightViewImage = UIImageView(frame: CGRect(x: 5, y: 0, width: 10, height: 10))
+        
+        let magnifyingglassImage = UIImage(systemName: "magnifyingglass")
+        let micImage = UIImage(systemName: "mic.fill")
+        
+        leftViewImage.image = magnifyingglassImage
+        rightViewImage.image = micImage
+        textField.leftView = leftViewImage
+        textField.rightView = rightViewImage
+        textField.leftViewMode = .always
+        
+        textField.delegate = context.coordinator
+        return textField
+    }
+
+    func makeCoordinator() -> CustomTextField.Coordinator {
+        return Coordinator(text: $text)
+    }
+
+    func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<CustomTextField>) {
+        uiView.text = text
+        if isFirstResponder && !context.coordinator.didBecomeFirstResponder  {
+            uiView.becomeFirstResponder()
+            context.coordinator.didBecomeFirstResponder = true
+        }
+    }
+}

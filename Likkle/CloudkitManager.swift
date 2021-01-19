@@ -8,7 +8,7 @@
 import Foundation
 import CloudKit
 
-class CloudKitManager {
+class CloudKitManager: ObservableObject {
     
     private let container = CKContainer.default()
     private(set) var accountStatus: CKAccountStatus = .couldNotDetermine
@@ -68,8 +68,7 @@ class CloudKitManager {
                     print("error occured")
                 } else {
                     guard let id = recordId else { return }
-                    
-                    print(id)
+
                     self?.userId = id
                 }
             }

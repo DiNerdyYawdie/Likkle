@@ -13,14 +13,20 @@ struct AddPostView: View {
     @ObservedObject var viewModel: AddPostViewModel
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
-    
-    var cloudkitManager: CloudKitManager
+    @EnvironmentObject var cloudkitManager: CloudKitManager
+
     @State var showCloudkitAlert: Bool = false
     
     var body: some View {
         NavigationView {
             ScrollView {
-                CommonInfoView(infoNotice: "Add a photo with caption to your Muckle with cash your serial code as ID")
+                
+                Text("Add a photo with caption to your Muckle with cash your serial code as ID")
+                    .font(.footnote)
+                    .padding(.horizontal)
+                
+                Divider()
+                    .padding(.horizontal)
                 
                 HStack {
                     Spacer()
@@ -53,38 +59,16 @@ struct AddPostView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
 
-                CommonInfoView(infoNotice: "Add caption")
+                Text("Add caption")
+                    .font(.footnote)
+                    .padding(.horizontal)
+                
                 
                 TextEditor(text: self.$viewModel.caption)
                     .border(Color.gray.opacity(0.6), width: 2)
                     .cornerRadius(10)
                     .frame(height: 200)
                     .padding()
-                
-                
-                CommonButtonView(title: "Share", isDisabled: self.$viewModel.isButtonEnabled) {
-                    let post = Post(context: viewContext)
-                    post.serialNumber = self.viewModel.serialNumber
-                    post.caption = self.viewModel.caption
-                    if !self.viewModel.images.isEmpty {
-                        let uploadedImage = self.viewModel.images[0]
-                        
-                        guard let data = uploadedImage.pngData() else {
-                            self.viewModel.showAlert.toggle()
-                            return  }
-                    
-                        post.postImage = data
-                    }
-                    
-                    do {
-                        if self.viewContext.hasChanges {
-                            try self.viewContext.save()
-                            self.presentationMode.wrappedValue.dismiss()
-                        }
-                    } catch {
-                        self.viewModel.showAlert.toggle()
-                    }
-                }
 
             }
             .sheet(isPresented: self.$viewModel.pickerBool, content: {
@@ -97,7 +81,7 @@ struct AddPostView: View {
                 Alert(title: Text("Please login to your Apple iCloud Account on your device"), message: Text("\(cloudkitManager.accountStatus.rawValue.description)"), dismissButton: .cancel())
             })
             .navigationBarTitle(Text("Add Post"), displayMode: .automatic)
-            .navigationBarItems(trailing: closeButton)
+            .navigationBarItems(trailing: shareButton)
             .onAppear {
                 self.viewModel.enableButton()
             }
@@ -106,13 +90,36 @@ struct AddPostView: View {
         
     }
     
-    var closeButton: some View {
-        Image(systemName: "x.circle.fill")
-        .resizable()
-        .frame(width: 25, height: 25, alignment: .center)
-        .foregroundColor(Color.red)
-        .onTapGesture {
-            self.presentationMode.wrappedValue.dismiss()
+    var shareButton: some View {
+        Text("Share")
+            .fontWeight(.bold)
+            .foregroundColor(!self.viewModel.serialNumber.isEmpty ? Color(UIColor.systemGreen) : .gray)
+            .disabled(!self.viewModel.serialNumber.isEmpty ? false : true)
+            .onTapGesture {
+            let post = Post(context: viewContext)
+            
+            post.serialNumber = self.viewModel.serialNumber
+            post.caption = self.viewModel.caption
+            
+            post.userId = cloudkitManager.userRecord?.recordID.recordName
+            if !self.viewModel.images.isEmpty {
+                let uploadedImage = self.viewModel.images[0]
+                
+                guard let data = uploadedImage.pngData() else {
+                    self.viewModel.showAlert.toggle()
+                    return  }
+            
+                post.postImage = data
+            }
+            
+            do {
+                if self.viewContext.hasChanges {
+                    try self.viewContext.save()
+                    self.presentationMode.wrappedValue.dismiss()
+                }
+            } catch {
+                self.viewModel.showAlert.toggle()
+            }
         }
     }
 }
