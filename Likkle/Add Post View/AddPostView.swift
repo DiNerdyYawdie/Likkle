@@ -66,7 +66,7 @@ struct AddPostView: View {
                 
                 TextEditor(text: self.$viewModel.caption)
                     .border(Color.gray.opacity(0.6), width: 2)
-                    .cornerRadius(10)
+                    .cornerRadius(5)
                     .frame(height: 200)
                     .padding()
 
@@ -96,12 +96,18 @@ struct AddPostView: View {
             .foregroundColor(!self.viewModel.serialNumber.isEmpty ? Color(UIColor.systemGreen) : .gray)
             .disabled(!self.viewModel.serialNumber.isEmpty ? false : true)
             .onTapGesture {
-            let post = Post(context: viewContext)
-            
-            post.serialNumber = self.viewModel.serialNumber
-            post.caption = self.viewModel.caption
-            
-            post.userId = cloudkitManager.userRecord?.recordID.recordName
+                
+            let postRecord = CKRecord(recordType: "CD_Post")
+            postRecord["CD_caption"] = self.viewModel.caption
+            postRecord["CD_serialNumber"] = self.viewModel.serialNumber
+            postRecord["CD_userId"] = cloudkitManager.userId?.recordName
+            cloudkitManager.saveRecord(record: postRecord)
+//            let post = Post(context: viewContext)
+//
+//            post.serialNumber = self.viewModel.serialNumber
+//            post.caption = self.viewModel.caption
+//
+//            post.userId = cloudkitManager.userRecord?.recordID.recordName
             if !self.viewModel.images.isEmpty {
                 let uploadedImage = self.viewModel.images[0]
                 
@@ -109,17 +115,18 @@ struct AddPostView: View {
                     self.viewModel.showAlert.toggle()
                     return  }
             
-                post.postImage = data
+                
+                //post.postImage = data
             }
             
-            do {
-                if self.viewContext.hasChanges {
-                    try self.viewContext.save()
-                    self.presentationMode.wrappedValue.dismiss()
-                }
-            } catch {
-                self.viewModel.showAlert.toggle()
-            }
+//            do {
+//                if self.viewContext.hasChanges {
+//                    try self.viewContext.save()
+//                    self.presentationMode.wrappedValue.dismiss()
+//                }
+//            } catch {
+//                self.viewModel.showAlert.toggle()
+//            }
         }
     }
 }

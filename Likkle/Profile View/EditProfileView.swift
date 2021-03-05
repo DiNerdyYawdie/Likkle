@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import CloudKit
 
 struct EditProfileView: View {
     
@@ -21,15 +22,27 @@ struct EditProfileView: View {
             VStack {
                 Form {
                     Section(header: Text("Add Photo")) {
-                        Image(systemName: "camera.viewfinder")
-                            .resizable()
-                            .frame(width: 150, height: 150, alignment: .center)
-                            .aspectRatio(contentMode: .fill)
-                            .foregroundColor(Color(UIColor.systemGreen))
-                            .onTapGesture {
-                                self.viewModel.pickerBool.toggle()
-                            }
-                            .padding()
+                        if self.viewModel.images.isEmpty {
+                            Image(systemName: "camera.viewfinder")
+                                .resizable()
+                                .frame(width: 150, height: 150, alignment: .center)
+                                .aspectRatio(contentMode: .fill)
+                                .foregroundColor(Color(UIColor.systemGreen))
+                                .padding()
+                                .onTapGesture {
+                                    self.viewModel.pickerBool.toggle()
+                                }
+                        } else {
+                            Image(uiImage: self.viewModel.images[0])
+                                .resizable()
+                                .frame(width: 150, height: 150, alignment: .center)
+                                .aspectRatio(contentMode: .fill)
+                                .foregroundColor(Color(UIColor.systemGreen))
+                                .padding()
+                                .onTapGesture {
+                                    self.viewModel.pickerBool.toggle()
+                                }
+                        }
                     }
                     
                     Section(header: Text("Change Username")) {
@@ -44,17 +57,26 @@ struct EditProfileView: View {
                     }
                 }
                 CommonButtonView(title: "Save", isDisabled: .constant(false)) {
-                    let userRecord = UserProfile(context: viewContext)
-                    userRecord.username = self.viewModel.newUsername
-                    userRecord.bio = self.viewModel.bioText
-                    
-                    do {
-                        if self.viewContext.hasChanges {
-                            try self.viewContext.save()
+                    let usersRecord = CKRecord(recordType: "Users")
+                    if !self.viewModel.images.isEmpty {
+                        let uploadedImage = self.viewModel.images[0]
+                        
+                        guard let data = uploadedImage.pngData() else {
+                            self.viewModel.showAlert.toggle()
+                            return  }
+                        
+                        
+                        cloudkitManager.editUserInfo(name: self.viewModel.newUsername, bio: self.viewModel.bioText, data: data) {
+                            DispatchQueue.main.async {
+                                self.presentationMode.wrappedValue.dismiss()
+                            }
+                          }
+                    } else {
+                        cloudkitManager.editUserInfo(name: self.viewModel.newUsername, bio: self.viewModel.bioText, data: nil) {
+                        DispatchQueue.main.async {
                             self.presentationMode.wrappedValue.dismiss()
                         }
-                    } catch {
-                        self.viewModel.showAlert.toggle()
+                      }
                     }
                 }
             }

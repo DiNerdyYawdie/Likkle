@@ -51,5 +51,8 @@ struct ContentView: View {
                         .tag(2)
                 })
             .accentColor(Color(UIColor.systemGreen))
+            .onAppear {
+//                cloudKitManager.requestUserInfo()
+                    }
     }
 }

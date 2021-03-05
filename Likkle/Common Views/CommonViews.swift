@@ -14,7 +14,7 @@ struct CardView: View {
     
     @Binding var showProfileModal: Bool
     var showAvatar: Bool
-    var post: Post
+    var post: CD_Post
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -27,21 +27,22 @@ struct CardView: View {
             }
             
            
-            if !(post.postImage?.isEmpty ?? true) {
-                Image(uiImage: UIImage(data: post.postImage!)!)
-                    .resizable()
-                    .aspectRatio(contentMode: ContentMode.fit)
-                EmptyView()
-            }
+//            if !(post.postImage?.isEmpty ?? true) {
+//                Image(uiImage: UIImage(data: post.postImage!)!)
+//                    .resizable()
+//                    .aspectRatio(contentMode: ContentMode.fit)
+//                    .cornerRadius(10)
+//                EmptyView()
+//            }
 
  
             HStack {
                 VStack(alignment: .leading) {
-                    Text(post.serialNumber ?? "serial number")
+                    Text(post.CD_serialNumber ?? "serial number")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text(post.caption ?? "caption")
+                    Text(post.CD_caption ?? "caption")
                         .font(.caption)
                         .fontWeight(.regular)
                         .foregroundColor(.primary)

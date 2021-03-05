@@ -14,15 +14,15 @@ struct ProfileView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var profileSegmentIndex = 0
     @EnvironmentObject var cloudkitManager: CloudKitManager
-    
-    @FetchRequest(
-        entity: Post.entity(),
-        sortDescriptors: []
-    ) var posts: FetchedResults<Post>
-    
+                                                    
+//    @FetchRequest(
+//        entity: Post.entity(),
+//        sortDescriptors: []
+//    ) var posts: FetchedResults<Post>
     
     var body: some View {
         NavigationView {
+            
             VStack {
                 Image(systemName: "person.circle")
                     .resizable()
@@ -30,10 +30,10 @@ struct ProfileView: View {
                     .aspectRatio(contentMode: .fit)
                     .padding()
                 
-                Text(cloudkitManager.fullname)
+                Text(cloudkitManager.currentUser.fullName)
                     .font(.title)
                 
-                Text(self.viewModel.bioText)
+                Text(cloudkitManager.currentUser.bio)
                     .lineLimit(4)
                     .padding()
                 
@@ -53,8 +53,7 @@ struct ProfileView: View {
                 .pickerStyle(SegmentedPickerStyle())
                 .padding()
                 
-                FilteredList(serialNumber: "", hideAvatar: profileSegmentIndex == 0 ? true : false, showProfileModal: .constant(false))
-                
+                //FilteredList(serialNumber: "", hideAvatar: profileSegmentIndex == 0 ? true : false, showProfileModal: .constant(false))
                 
             }
             .onTapGesture {
@@ -68,36 +67,42 @@ struct ProfileView: View {
             }))
             .sheet(isPresented: self.$viewModel.showAddPostModal, content: {
                 EditProfileView(viewModel: viewModel)
+                    .environmentObject(cloudkitManager)
+                    .environment(\.managedObjectContext, viewContext)
             })
+            .onAppear {
+                DispatchQueue.main.async {
+                    self.cloudkitManager.getUserRecord()
+                }
+            }
         }
     }
 }
 
-struct ProfileList: View {
-    
-    var fetchRequest: FetchRequest<Post>
-    var hideAvatar: Bool
-    var userId: String
-    @Binding var showProfileModal: Bool
-    
-    init(hideAvatar: Bool, showProfileModal: Binding<Bool>, userId: String) {
-        self.hideAvatar = hideAvatar
-        self._showProfileModal = showProfileModal
-        self.userId = userId
-        fetchRequest = FetchRequest<Post>(entity: Post.entity(), sortDescriptors: [], predicate: NSPredicate(format: "userId ==[c] %@", userId), animation: .default)
-    }
-    
-    var body: some View {
-            List(fetchRequest.wrappedValue, id: \.self) { post in
-                NavigationLink(destination: SearchHomeDetailView(post: post)) {
-                    ZStack {
-                        CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
-                    }
-                    
-                }
-                
-            }
-            .listStyle(InsetListStyle())
-            
-    }
-}
+//struct ProfileList: View {
+//
+//    var fetchRequest: FetchRequest<Post>
+//    var hideAvatar: Bool
+//    var userId: String
+//    @Binding var showProfileModal: Bool
+//
+//    init(hideAvatar: Bool, showProfileModal: Binding<Bool>, userId: String) {
+//        self.hideAvatar = hideAvatar
+//        self._showProfileModal = showProfileModal
+//        self.userId = userId
+//        fetchRequest = FetchRequest<Post>(entity: Post.entity(), sortDescriptors: [], predicate: NSPredicate(format: "userId ==[c] %@", userId), animation: .default)
+//    }
+//
+//    var body: some View {
+//            List(fetchRequest.wrappedValue, id: \.self) { post in
+//                NavigationLink(destination: SearchHomeDetailView(post: post)) {
+//                    ZStack {
+//                        CardView(showProfileModal: self.$showProfileModal, showAvatar: hideAvatar, post: post)
+//                    }
+//
+//                }
+//
+//            }
+//            .listStyle(InsetListStyle())
+//    }
+//}
